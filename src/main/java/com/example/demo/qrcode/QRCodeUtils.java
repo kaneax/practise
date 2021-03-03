@@ -32,11 +32,44 @@ public class QRCodeUtils {
     private static final String FORMAT_NAME = "JPG";
 
     //二维码尺寸
-    private static final int QRCODE_SIZE = 300;
+    private static final int QRCODE_SIZE = 20;
     //LOGO宽度
-    private static final int WIDTH = 60;
+    private static final int WIDTH = 10;
     //LOGO高度
-    private static final int HEIGHT = 60;
+    private static final int HEIGHT = 5;
+
+
+    /**
+     * 创建图片
+     * @param content url 地址
+     * @return
+     * @throws Exception
+     */
+    private static BufferedImage createImage(String content,String imgPath)throws Exception{
+        Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
+        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+        hints.put(EncodeHintType.CHARACTER_SET, CHARSET);
+        hints.put(EncodeHintType.MARGIN, 1);
+        BitMatrix bitMatrix = new MultiFormatWriter().encode(content,
+                BarcodeFormat.QR_CODE, QRCODE_SIZE, QRCODE_SIZE, hints);
+        int width = bitMatrix.getWidth();
+        int height = bitMatrix.getHeight();
+        BufferedImage image = new BufferedImage(width, height,
+                BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                image.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000
+                        : 0xFFFFFFFF);
+            }
+        }
+        if (imgPath == null || "".equals(imgPath)) {
+            return image;
+        }
+        // 插入二维码
+        QRCodeUtils.insertQrCode(imgPath,image);
+
+        return image;
+    }
 
     /**
      * 生成二维码图片
@@ -69,6 +102,38 @@ public class QRCodeUtils {
         QRCodeUtils.insertImage(image, imgPath, needCompress);
         return image;
     }
+
+    /**
+     * 图片地址内嵌二维码
+     * @param imgPath 图片地址
+     * @param source  二维码
+     */
+    private static void insertQrCode(String imgPath,BufferedImage source)throws Exception{
+        File file = new File(imgPath);
+        if (!file.exists()) {
+            System.err.println(""+imgPath+"   该文件不存在！");
+            return;
+        }
+        BufferedImage src = ImageIO.read(new File(imgPath));
+        int width = src.getWidth(null);
+        int height = src.getHeight(null);
+
+        // 插入LOGO
+        Graphics2D graph = src.createGraphics();
+        int x = (width - QRCODE_SIZE) / 2;
+        int y = (height - QRCODE_SIZE) / 2;
+        graph.drawImage(source, x, y, 100, 80, null);
+        //Shape shape = new RoundRectangle2D.Float(x, y, width, width, 6, 6);
+        graph.setStroke(new BasicStroke(0.1f));
+        //graph.draw(shape);
+        //结束绘画
+        graph.dispose();
+
+        mkdirs("/Users/zhuqingbiao/Desktop");
+        String file1 = new Random().nextInt(99999999)+".png";
+        ImageIO.write(src, "png", new File("/Users/zhuqingbiao/Desktop"+"/"+file1));
+    }
+
 
     /**
      *
@@ -133,6 +198,20 @@ public class QRCodeUtils {
         String file = new Random().nextInt(99999999)+".jpg";
         ImageIO.write(image, FORMAT_NAME, new File(destPath+"/"+file));
         return file;
+    }
+
+    /**
+     * 图片中插入二维码
+     * @param content
+     * @param imgPath
+     * @param destPath
+     * @return
+     * @throws Exception
+     */
+    public static String encodeImage(String content, String imgPath, String destPath) throws Exception {
+        BufferedImage image = QRCodeUtils.createImage(content, imgPath);
+
+        return "";
     }
 
     /**
@@ -269,10 +348,12 @@ public class QRCodeUtils {
 
     public static void main(String[] args) throws Exception {
         String text = "www.baidu.com";  //这里设置自定义网站url
-        String logoPath = "/Users/zhuqingbiao/Desktop/mao.jpg";
-        String destPath = "/Users/zhuqingbiao/Desktop";
-        System.out.println(QRCodeUtils.encode(text, logoPath, destPath, true));
+        String destPath = "/Users/zhuqingbiao/Desktop/测试图片1.png";
+        String logoPath = "/Users/zhuqingbiao/Desktop";
+        //System.out.println(QRCodeUtils.encode(text, logoPath, destPath, true));
 
+
+        System.out.println(QRCodeUtils.encodeImage(text,destPath,logoPath));
 
 
     }

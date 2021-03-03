@@ -8,5 +8,6 @@ package com.example.demo.solution;
 public class Solution1 {
     public static void main(String[] args) {
 
+
     }
 }
