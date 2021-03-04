@@ -11,12 +11,17 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Hashtable;
 import java.util.Random;
@@ -32,7 +37,7 @@ public class QRCodeUtils {
     private static final String FORMAT_NAME = "JPG";
 
     //二维码尺寸
-    private static final int QRCODE_SIZE = 20;
+    private static final int QRCODE_SIZE = 182;
     //LOGO宽度
     private static final int WIDTH = 10;
     //LOGO高度
@@ -122,7 +127,10 @@ public class QRCodeUtils {
         Graphics2D graph = src.createGraphics();
         int x = (width - QRCODE_SIZE) / 2;
         int y = (height - QRCODE_SIZE) / 2;
-        graph.drawImage(source, x, y, 100, 80, null);
+
+        //调整x,y
+
+        graph.drawImage(source, 287, 960, source.getWidth(), source.getHeight(), null);
         //Shape shape = new RoundRectangle2D.Float(x, y, width, width, 6, 6);
         graph.setStroke(new BasicStroke(0.1f));
         //graph.draw(shape);
@@ -134,6 +142,47 @@ public class QRCodeUtils {
         ImageIO.write(src, "png", new File("/Users/zhuqingbiao/Desktop"+"/"+file1));
     }
 
+    private static String insertQrCode1(String imgPath,BufferedImage source)throws Exception{
+        File file = new File(imgPath);
+        if (!file.exists()) {
+            System.err.println(""+imgPath+"   该文件不存在！");
+            return "";
+        }
+        BufferedImage src = ImageIO.read(new File(imgPath));
+        int width = src.getWidth(null);
+        int height = src.getHeight(null);
+
+        // 插入LOGO
+        Graphics2D graph = src.createGraphics();
+        //int x = (width - QRCODE_SIZE) / 2;
+        //int y = (height - QRCODE_SIZE) / 2;
+
+        //调整x,y
+
+        graph.drawImage(source, 267, 960, source.getWidth(), source.getHeight(), null);
+        //Shape shape = new RoundRectangle2D.Float(x, y, width, width, 6, 6);
+        graph.setStroke(new BasicStroke(0.1f));
+        //graph.draw(shape);
+        //结束绘画
+        graph.dispose();
+
+        //为了保证大图背景不变色，formatName必须为"png"
+        //字节数组流
+        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        //将图片流转换为字节数组流
+        ImageOutputStream imOut = ImageIO.createImageOutputStream(bs);
+        //将合成好的背景图输入到字节数组流中
+        ImageIO.write(src, "png", imOut);
+        //将字节数组流转换为二进制流
+        InputStream in = new ByteArrayInputStream(bs.toByteArray());
+        byte[] bytes = new byte[in.available()];
+        //读取数组流中的数据
+        in.read(bytes);
+        //转换为base64数据类型
+        String base64String = Base64.encodeBase64String(bytes);
+        System.out.println(("data:image/png;base64,").concat(base64String));
+        return base64String;
+    }
 
     /**
      *
@@ -348,7 +397,7 @@ public class QRCodeUtils {
 
     public static void main(String[] args) throws Exception {
         String text = "www.baidu.com";  //这里设置自定义网站url
-        String destPath = "/Users/zhuqingbiao/Desktop/测试图片1.png";
+        String destPath = "/Users/zhuqingbiao/Downloads/docsmall/poster3.png";
         String logoPath = "/Users/zhuqingbiao/Desktop";
         //System.out.println(QRCodeUtils.encode(text, logoPath, destPath, true));
 
