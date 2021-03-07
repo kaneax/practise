@@ -11,6 +11,9 @@ import java.util.concurrent.Future;
  */
 public class ThreadPools {
 
+    /**
+     * 静态内部类来创建单例
+     */
     private static class ThreadPoolManagerHolder{
         private static ThreadPools instance = new ThreadPools();
     }
