@@ -43,7 +43,7 @@ public class ThreadPools {
      * @param <T>
      * @return
      */
-    public <T> Future<T> getGoods(Callable<T> task){
+    public <T> Future<T> getGoodsList(Callable<T> task){
        return goodsExecutorService.submit(task);
     }
 
