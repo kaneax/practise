@@ -112,6 +112,9 @@ public class QRCodeUtils {
         return image;
     }
 
+
+
+
     /**
      * 图片地址内嵌二维码
      * @param imgPath 图片地址
