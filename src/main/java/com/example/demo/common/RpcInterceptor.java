@@ -24,7 +24,7 @@ public class RpcInterceptor {
     public static final String MDC_TRADE_ID = "INNER_TRACE_ID";
 
     //环绕通知
-    @Around("execution(public * com.example.demo.common..*.*(..)) || execution(public * com.example.demo.common..*.*(..))")
+    //@Around("execution(public * com.example.demo.common..*.*(..)) || execution(public * com.example.demo.common..*.*(..))")
     public Object execute(ProceedingJoinPoint pjp)throws Throwable{
         Object[] args = pjp.getArgs();
         Object result = null;
