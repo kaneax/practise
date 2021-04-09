@@ -34,4 +34,12 @@ public class IndexApi {
         IndexRequest posts = new IndexRequest("posts").id("1").source(jsonMap);
 
     }
+
+    public static void main(String[] args) {
+        int n = 16;
+        int sc = 0 ;
+        sc = n - (n >>> 2);
+
+        System.out.println(sc);
+    }
 }
